@@ -1,0 +1,73 @@
+@using WebApplication2.Models
+@model WebApplication2.Models.Borrowing
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Update Borrowing";
+    //Chatgpt Select fix
+    var bookValues = (ViewBag.BookValues as IEnumerable<DropdownDto>) ?? Array.Empty<DropdownDto>();
+    var readerValues = (ViewBag.ReaderValues as IEnumerable<DropdownDto>) ?? Array.Empty<DropdownDto>();
+    var daysToBorrow = Model?.DaysToBorrow > 0 ? Model.DaysToBorrow : 7;
+    var borrowedDate = (Model?.BorrowedDate ?? DateTime.Today);
+    if (borrowedDate == DateTime.MinValue)
+    {
+        borrowedDate = DateTime.Today;
+    }
+}
+
+<h1 class="h3 mb-3">Update Borrowing</h1>
+
+<form asp-action="Update" method="post" asp-route-id="@Model.ID" class="row g-3">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="col-md-6">
+        <label for="BookId" class="form-label">Book</label>
+        <select id="BookId" name="BookId" class="form-select">
+            <option value="">Select a book</option>
+            @foreach (var book in bookValues)
+            {
+                <option value="@book.Value" selected="@(book.Selected ? "selected" : null)">@book.Name</option>
+            }
+        </select>
+        <span asp-validation-for="BookId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label for="ReaderId" class="form-label">Reader</label>
+        <select id="ReaderId" name="ReaderId" class="form-select">
+            <option value="">Select a reader</option>
+            @foreach (var reader in readerValues)
+            {
+                <option value="@reader.Value" selected="@(reader.Selected ? "selected" : null)">@reader.Name</option>
+            }
+        </select>
+        <span asp-validation-for="ReaderId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label for="DaysToBorrow" class="form-label">Days To Borrow</label>
+        <input id="DaysToBorrow" name="DaysToBorrow" type="number" min="1" class="form-control" value="@daysToBorrow" />
+        <span asp-validation-for="DaysToBorrow" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label for="BorrowedDate" class="form-label">Borrowed Date</label>
+        <input id="BorrowedDate" name="BorrowedDate" type="date" class="form-control" value="@borrowedDate.ToString("yyyy-MM-dd")" />
+        <span asp-validation-for="BorrowedDate" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label for="ReturnedDate" class="form-label">Returned date Date</label>
+        <input id="ReturnedDate" name="ReturnedDate" type="date" class="form-control" value="@Model.ReturnedDate" />
+        <span asp-validation-for="ReturnedDate" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a asp-action="Borrower" asp-route-id="@Model.ID" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

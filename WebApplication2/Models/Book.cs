@@ -4,7 +4,6 @@ namespace WebApplication2.Models
 {
     public class Book
     {
-        [Required]
         public int ID { get; set; }
 
         [Required, StringLength(30)]

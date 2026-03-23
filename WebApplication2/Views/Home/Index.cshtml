@@ -1,0 +1,91 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Home page";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Dashboard</h1>
+</div>
+
+
+<div class="table-responsive">
+    <h1 class="h3 mb-0">Books</h1>
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>IBSN</th>
+                <th>Availablity</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in ViewBag.BookValues as IEnumerable<Book>)
+            {
+            <tr>
+                    <td>
+                        <a asp-controller="Book" asp-action="Book" asp-route-id="@book.ID">@book.Title</a>
+                    </td>
+                    <td>@book.Author</td>
+                    <td>@book.IBSN</td>
+                    <td>@(@book.IsAvailable ? "Available" : "Checked out")</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="table-responsive">
+    <h1 class="h3 mb-0">Readers</h1>
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reader in ViewBag.ReaderValues as IEnumerable<Reader>)
+            {
+            <tr>
+                    <td>
+                        <a asp-controller="Reader" asp-action="Reader" asp-route-id="@reader.ID">@reader.Name</a>
+                    </td>
+                    <td>@reader.Email</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="table-responsive">
+    <h1 class="h3 mb-0">Borrowings</h1>
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Borrowing</th>
+                <th>Reader</th>
+                <th>Book</th>
+                <th>Borrowed Date</th>
+                <th>Return Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var borrowing in ViewBag.BorrowingValues as IEnumerable<BorrowingDto>)
+            {
+            <tr>
+                    <td>
+                    <a asp-controller="Borrowing" asp-action="Borrowing" asp-route-id="@borrowing.ID">@borrowing.ID</a>
+                    </td>
+                    <td>
+                    <a asp-controller="Reader" asp-action="Reader" asp-route-id="@borrowing.ReaderId">@borrowing.ReaderName</a>
+                    </td>
+                    <td>
+                        <a asp-controller="Book" asp-action="Book" asp-route-id="@borrowing.BookId">@borrowing.BookName</a>
+                    </td>
+                    <td>@borrowing.BorrowedDate</td>
+                    <td>@(@borrowing.IsReturned ? "Returned at" : "Exprected By") @borrowing.LastDate</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

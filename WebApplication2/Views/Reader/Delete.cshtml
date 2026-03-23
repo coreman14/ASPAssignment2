@@ -1,0 +1,14 @@
+@model WebApplication2.Models.Reader
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Reader Deleted";
+}
+
+<div class="alert alert-success" role="alert">
+    <h1 class="h4">Reader deleted</h1>
+    <p class="mb-1">The following Reader has been removed:</p>
+    <p class="mb-0"><strong>@Model.Name</strong> with email @Model.Email</p>
+</div>
+
+<a asp-action="Index" class="btn btn-primary">Back to Books</a>

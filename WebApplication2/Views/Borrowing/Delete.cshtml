@@ -1,0 +1,14 @@
+@model WebApplication2.Models.Borrowing
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Borrwing Deleted";
+}
+
+<div class="alert alert-success" role="alert">
+    <h1 class="h4">Borrowing deleted</h1>
+    <p class="mb-1">The following borrowing has been removed:</p>
+    <p class="mb-0"><strong><a asp-controller="Reader" asp-action="Reader" asp-route-id="@Model.ReaderId" class="btn btn-sm btn-outline-secondary">@Model.ReaderId</a></strong> borrowing <a asp-controller="Book" asp-action="Book" asp-route-id="@Model.BookId" class="btn btn-sm btn-outline-secondary">@Model.BookId</a> for @Model.DaysToBorrow on @Model.BorrowedDate. @(@Model.IsReturned ? "Returned on "+ @Model.ReturnedDate : "It was not returned")</p>
+</div>
+
+<a asp-action="Index" class="btn btn-primary">Back to Borrowings</a>

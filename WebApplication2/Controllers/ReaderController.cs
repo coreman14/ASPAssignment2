@@ -6,59 +6,73 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Models;
+using WebApplication2.Repositories;
 
 namespace WebApplication2.Controllers
 {
     public class ReaderController : Controller
     {
-
-        public ReaderController()
+        public async Task<IActionResult> Index()
         {
+            return View(ReaderRepository.GetAll());
         }
 
-        public async Task<Reader[]> Index()
+        public async Task<IActionResult> Reader(int id)
         {
-            return [];
-        }
-
-        public async Task<Reader> Reader(int? id)
-        {
-            return new Reader
+            var x = ReaderRepository.GetById(id);
+            if (x == null)
             {
-                ID = id.GetValueOrDefault(1),
-                Email = "Same thing",
-                Name = "Ha"
-            };
+                ViewBag.missType = "Reader";
+                return View("miss");
+            }
+            return View(x);
         }
         [HttpPost]
-        public async Task<Reader> Create(Reader reader)
+        public async Task<IActionResult> Create(Reader reader)
         {
-            return new Reader
+            if (ModelState.IsValid)
             {
-                Email = "Same thing",
-                Name = "Ha"
-            };
+                ReaderRepository.Create(reader);
+                return RedirectToAction("Index");
+            }
+            return View(reader);//Return back to Create page if invalid
         }
-        [HttpPut]
-        public async Task<Reader> Update(int? id, Reader reader)
+        public async Task<IActionResult> Create()
         {
-            return new Reader
-            {
-                ID = id.GetValueOrDefault(1),
-                Email = "Same thing",
-                Name = "Ha"
-            };
+            return View();
         }
-        [HttpDelete]
-        public async Task<Reader> Delete(int? id)
+        [HttpPost]
+        public async Task<IActionResult> Update(int id, Reader reader)
         {
-            return new Reader
+            reader.ID = id;
+            if (ModelState.IsValid)
             {
-                ID = id.GetValueOrDefault(1),
-                Email = "Same thing",
-                Name = "Ha"
-            };
+                ReaderRepository.Update(reader);
+                return RedirectToAction("Index");
+            }
+            return View(reader);//Return back to Create page if invalid
+        }
+        public async Task<IActionResult> Update(int id)
+        {
+            var x = ReaderRepository.GetById(id);
+            if (x == null)
+            {
+                ViewBag.missType = "Reader";
+                return View("miss");
+            }
+            return View(x);
         }
 
+        public async Task<IActionResult> Delete(int id)
+        {
+            var x = ReaderRepository.GetById(id);
+            if (x == null)
+            {
+                ViewBag.missType = "Reader";
+                return View("miss");
+            }
+            ReaderRepository.Delete(id);
+            return View(x);
+        }
     }
 }

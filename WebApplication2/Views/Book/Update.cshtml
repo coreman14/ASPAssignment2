@@ -1,0 +1,46 @@
+@model WebApplication2.Models.Book
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Update Book";
+}
+
+<h1 class="h3 mb-3">Update Book</h1>
+
+<form asp-action="Update" asp-route-id="@Model.ID" method="post" class="row g-3">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="col-md-6">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="Author" class="form-label"></label>
+        <input asp-for="Author" class="form-control" />
+        <span asp-validation-for="Author" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="IBSN" class="form-label"></label>
+        <input asp-for="IBSN" class="form-control" />
+        <span asp-validation-for="IBSN" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <div class="form-check">
+            <input asp-for="IsAvailable" class="form-check-input" />
+            <label asp-for="IsAvailable" class="form-check-label"></label>
+        </div>
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a asp-action="Book" asp-route-id="@Model.ID" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

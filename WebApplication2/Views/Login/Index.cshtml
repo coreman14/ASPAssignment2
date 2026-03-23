@@ -1,0 +1,25 @@
+@{
+	Layout = "_Layout";
+	ViewData["Title"] = "Login";
+}
+
+<h1 class="h3 mb-3">Login</h1>
+
+<form asp-action="Login" asp-controller="Login" method="post" class="row g-3">
+	<div class="col-md-6">
+		<label for="email" class="form-label">Email</label>
+		<input id="email" name="email" type="email" class="form-control" required />
+	</div>
+
+	<div class="col-md-6">
+		<label for="password" class="form-label">Password</label>
+		<input id="password" name="password" type="password" class="form-control" required />
+	</div>
+
+	<div class="col-12 d-flex gap-2">
+        <span class="text-danger">@ViewBag.error</span>
+		<button type="submit" class="btn btn-primary">Login</button>
+		<a asp-controller="Register" asp-action="Index" class="btn btn-outline-secondary">Create account</a>
+	</div>
+</form>
+

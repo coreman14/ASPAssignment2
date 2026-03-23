@@ -1,0 +1,14 @@
+@model WebApplication2.Models.Book
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Book Deleted";
+}
+
+<div class="alert alert-success" role="alert">
+    <h1 class="h4">Book deleted</h1>
+    <p class="mb-1">The following book has been removed:</p>
+    <p class="mb-0"><strong>@Model.Title</strong> by @Model.Author</p>
+</div>
+
+<a asp-action="Index" class="btn btn-primary">Back to Books</a>

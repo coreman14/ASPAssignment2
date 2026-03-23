@@ -1,0 +1,50 @@
+@model IEnumerable<WebApplication2.Models.Book>
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Books";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Books</h1>
+    <a asp-action="Create" class="btn btn-primary">Add New Book</a>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">No books found.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>ISBN</th>
+                    <th>Available</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var book in Model)
+                {
+                    <tr>
+                        <td>
+                            <a asp-action="Book" asp-route-id="@book.ID">@book.Title</a>
+                        </td>
+                        <td>@book.Author</td>
+                        <td>@book.IBSN</td>
+                        <td>@(book.IsAvailable ? "Yes" : "No")</td>
+                        <td class="text-end">
+                            <a asp-action="Book" asp-route-id="@book.ID" class="btn btn-sm btn-outline-secondary">View</a>
+                            <a asp-action="Update" asp-route-id="@book.ID" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@book.ID" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

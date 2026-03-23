@@ -1,0 +1,54 @@
+@model IEnumerable<WebApplication2.Models.Borrowing>
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Borrowings";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Borrowings</h1>
+    <a asp-action="Create" class="btn btn-primary">Add New Borrowing</a>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">No Borrowings found.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Book ID</th>
+                    <th>Reader ID</th>
+                    <th>Borrowed Date</th>
+                    <th>Allowed Borrow Days</th>
+                    <th>Return Date</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var borrowing in Model)
+                {
+                    <tr>
+                        <td>
+                            <a asp-action="Borrowing" asp-route-id="@borrowing.ID">@borrowing.ID</a>
+                        </td>
+                        <td><a asp-controller="Book" asp-action="Book" asp-route-id="@borrowing.BookId" class="btn btn-sm btn-outline-secondary">@borrowing.BookId</a></td>
+                        <td><a asp-controller="Reader" asp-action="Reader" asp-route-id="@borrowing.ReaderId" class="btn btn-sm btn-outline-secondary">@borrowing.ReaderId</a></td>
+                        <td>@borrowing.BorrowedDate</td>
+                        <td>@borrowing.DaysToBorrow</td>
+                        <td>@(@borrowing.IsReturned ? @borrowing.ReturnedDate : "Not Returned")</td>
+                        <td class="text-end">
+                            <a asp-action="Borrowing" asp-route-id="@borrowing.ID" class="btn btn-sm btn-outline-secondary">View</a>
+                            <a asp-action="Update" asp-route-id="@borrowing.ID" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@borrowing.ID" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
