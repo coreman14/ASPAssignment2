@@ -37,14 +37,37 @@ namespace WebApplication2.Controllers
 {
     public class BookController : Controller
     {
+        private readonly BookRepository _bookRepository;
+
+        public BookController(BookRepository bookRepository)
+        {
+            _bookRepository = bookRepository;
+        }
+
         public async Task<IActionResult> Index()
         {
-            return View(BookRepository.GetAll());
+            return View(_bookRepository.GetAll());
+        }
+
+        public async Task<IActionResult> Search([FromQuery]string searchstring)
+        {
+            ViewBag.results = null;
+            IEnumerable<Book>? r = string.IsNullOrEmpty(searchstring) ? null : _bookRepository.GetQuery(searchstring);
+            if (r == null || !r.Any())
+            {
+                r = null;
+            }
+            else
+            {
+                int rc = r.Count();
+                ViewBag.results = $"Found {rc} book{(rc == 1 ? "" : "s")} for {searchstring}";
+            }
+            return View(r);
         }
 
         public async Task<IActionResult> Book(int id)
         {
-            var x = BookRepository.GetById(id);
+            var x = _bookRepository.GetById(id);
             if (x == null)
             {
                 ViewBag.missType = "Book";
@@ -57,7 +80,7 @@ namespace WebApplication2.Controllers
         {
             if (ModelState.IsValid)
             {
-                BookRepository.Create(book);
+                _bookRepository.Create(book);
                 return RedirectToAction("Index");
             }
             return View(book);//Return back to Create page if invalid
@@ -72,14 +95,14 @@ namespace WebApplication2.Controllers
             book.ID = id;
             if (ModelState.IsValid)
             {
-                BookRepository.Update(book);
+                _bookRepository.Update(book);
                 return RedirectToAction("Index");
             }
             return View(book);//Return back to Create page if invalid
         }
         public async Task<IActionResult> Update(int id)
         {
-            var x = BookRepository.GetById(id);
+            var x = _bookRepository.GetById(id);
             if (x == null)
             {
                 ViewBag.missType = "Book";
@@ -90,13 +113,13 @@ namespace WebApplication2.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            var x = BookRepository.GetById(id);
+            var x = _bookRepository.GetById(id);
             if (x == null)
             {
                 ViewBag.missType = "Book";
                 return View("miss");
             }
-            BookRepository.Delete(id);
+            _bookRepository.Delete(id);
             return View(x);
         }
     }

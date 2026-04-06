@@ -1,29 +1,34 @@
+using WebApplication2.Data;
 using WebApplication2.Models;
 
 namespace WebApplication2.Repositories
 {
-    public static class ReaderRepository
+    public class ReaderRepository
     {
-        private static readonly List<Reader> _readers =
-        [
-            new Reader { ID = 1, Name = "Alice Johnson", Email = "alice@lms.com" },
-            new Reader { ID = 2, Name = "Bob Smith", Email = "bob@cws.com" }
-        ];
+        private readonly ApplicationDbContext _context;
 
-        public static IEnumerable<Reader> GetAll() => _readers.OrderBy(r => r.ID);
-
-        public static Reader? GetById(int id) => _readers.FirstOrDefault(r => r.ID == id);
-        public static bool IdExist(int id) => _readers.FirstOrDefault(r => r.ID == id) != null;
-
-        public static Reader Create(Reader reader)
+        public ReaderRepository(ApplicationDbContext context)
         {
-            var _nextId = _readers.Count > 0 ? _readers.Max((x) => x.ID) + 1 : 1;
-            reader.ID = _nextId++;
-            _readers.Add(reader);
+            _context = context;
+        }
+
+        public IEnumerable<Reader> GetAll() => _context.Readers.OrderBy(r => r.ID).ToList();
+
+        public IEnumerable<Reader> GetQuery(string includesText) => _context.Readers.Where((x) =>
+            x.Email.ToLower().Contains(includesText.ToLower()) || x.Name.ToLower().Contains(includesText.ToLower())
+        )
+        .OrderBy(b => b.ID).ToList();
+        public Reader? GetById(int id) => _context.Readers.FirstOrDefault(r => r.ID == id);
+        public bool IdExist(int id) => _context.Readers.Any(r => r.ID == id);
+
+        public Reader Create(Reader reader)
+        {
+            _context.Readers.Add(reader);
+            _context.SaveChanges();
             return reader;
         }
 
-        public static bool Update(Reader reader)
+        public bool Update(Reader reader)
         {
             var existing = GetById(reader.ID);
             if (existing is null)
@@ -33,10 +38,11 @@ namespace WebApplication2.Repositories
 
             existing.Name = reader.Name;
             existing.Email = reader.Email;
+            _context.SaveChanges();
             return true;
         }
 
-        public static bool Delete(int id)
+        public bool Delete(int id)
         {
             var existing = GetById(id);
             if (existing is null)
@@ -44,7 +50,8 @@ namespace WebApplication2.Repositories
                 return false;
             }
 
-            _readers.Remove(existing);
+            _context.Readers.Remove(existing);
+            _context.SaveChanges();
             return true;
         }
     }

@@ -1,11 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WebApplication2.Data;
+using WebApplication2.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Add DbContext with SQLite
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<BookRepository>();
+builder.Services.AddScoped<ReaderRepository>();
+builder.Services.AddScoped<BorrowingRepository>();
+builder.Services.AddScoped<AppUserRepository>();
 
 var app = builder.Build();
 

@@ -12,14 +12,37 @@ namespace WebApplication2.Controllers
 {
     public class ReaderController : Controller
     {
+        private readonly ReaderRepository _readerRepository;
+
+        public ReaderController(ReaderRepository readerRepository)
+        {
+            _readerRepository = readerRepository;
+        }
+
         public async Task<IActionResult> Index()
         {
-            return View(ReaderRepository.GetAll());
+            return View(_readerRepository.GetAll());
+        }
+        
+        public async Task<IActionResult> Search([FromQuery]string searchstring)
+        {
+            ViewBag.results = null;
+            IEnumerable<Reader>? r = string.IsNullOrEmpty(searchstring) ? null : _readerRepository.GetQuery(searchstring);
+            if (r == null || !r.Any())
+            {
+                r = null;
+            }
+            else
+            {
+                int rc = r.Count();
+                ViewBag.results = $"Found {rc} reader{(rc == 1 ? "" : "s")} for {searchstring}";
+            }
+            return View(r);
         }
 
         public async Task<IActionResult> Reader(int id)
         {
-            var x = ReaderRepository.GetById(id);
+            var x = _readerRepository.GetById(id);
             if (x == null)
             {
                 ViewBag.missType = "Reader";
@@ -32,7 +55,7 @@ namespace WebApplication2.Controllers
         {
             if (ModelState.IsValid)
             {
-                ReaderRepository.Create(reader);
+                _readerRepository.Create(reader);
                 return RedirectToAction("Index");
             }
             return View(reader);//Return back to Create page if invalid
@@ -47,14 +70,14 @@ namespace WebApplication2.Controllers
             reader.ID = id;
             if (ModelState.IsValid)
             {
-                ReaderRepository.Update(reader);
+                _readerRepository.Update(reader);
                 return RedirectToAction("Index");
             }
             return View(reader);//Return back to Create page if invalid
         }
         public async Task<IActionResult> Update(int id)
         {
-            var x = ReaderRepository.GetById(id);
+            var x = _readerRepository.GetById(id);
             if (x == null)
             {
                 ViewBag.missType = "Reader";
@@ -65,13 +88,13 @@ namespace WebApplication2.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            var x = ReaderRepository.GetById(id);
+            var x = _readerRepository.GetById(id);
             if (x == null)
             {
                 ViewBag.missType = "Reader";
                 return View("miss");
             }
-            ReaderRepository.Delete(id);
+            _readerRepository.Delete(id);
             return View(x);
         }
     }

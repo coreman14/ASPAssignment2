@@ -7,6 +7,12 @@ namespace WebApplication2.Controllers
 {
     public class LoginController : Controller
     {
+        private readonly AppUserRepository _appUserRepository;
+
+        public LoginController(AppUserRepository appUserRepository)
+        {
+            _appUserRepository = appUserRepository;
+        }
 
         public IActionResult Index()
         {
@@ -16,7 +22,7 @@ namespace WebApplication2.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string email, string password)
         {
-            if (AppUserRepository.ValidateCredentials(email, password))
+            if (_appUserRepository.ValidateCredentials(email, password))
             {
                 return RedirectToAction("Index", "Home");
             }

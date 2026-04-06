@@ -1,24 +1,42 @@
+using WebApplication2.Data;
 using WebApplication2.Models;
 
 namespace WebApplication2.Repositories
 {
-    public static class BorrowingRepository
+    public class BorrowingRepository
     {
-        private static readonly List<Borrowing> _borrowings = [];
+        private readonly ApplicationDbContext _context;
+        private readonly BookRepository _books;
+        private readonly ReaderRepository _readers;
 
-        public static IEnumerable<Borrowing> GetAll() => _borrowings.OrderBy(b => b.ID);
-
-        public static Borrowing? GetById(int id) => _borrowings.FirstOrDefault(b => b.ID == id);
-
-        public static Borrowing Create(Borrowing borrowing)
+        public BorrowingRepository(ApplicationDbContext context, ReaderRepository readers, BookRepository books)
         {
-            var _nextId = _borrowings.Count > 0 ? _borrowings.Max((x) => x.ID) + 1 : 1;
-            borrowing.ID = _nextId++;
-            _borrowings.Add(borrowing);
+            _context = context;
+            _books = books;
+            _readers = readers;
+        }
+
+        public IEnumerable<Borrowing> GetAll() => _context.Borrowings.OrderBy(b => b.ID).ToList();
+
+        public IEnumerable<Borrowing> GetQuery(string includesText){
+            var bookIds = _books.GetQuery(includesText).Select((x) => x.ID);
+            var readerIds = _readers.GetQuery(includesText).Select((x) => x.ID);
+            return _context.Borrowings.Where((x) =>
+                bookIds.Contains(x.BookId) || readerIds.Contains(x.ReaderId)
+            )
+            .OrderBy(b => b.ID).ToList();
+            
+        } 
+        public Borrowing? GetById(int id) => _context.Borrowings.FirstOrDefault(b => b.ID == id);
+
+        public Borrowing Create(Borrowing borrowing)
+        {
+            _context.Borrowings.Add(borrowing);
+            _context.SaveChanges();
             return borrowing;
         }
 
-        public static bool Update(Borrowing borrowing)
+        public bool Update(Borrowing borrowing)
         {
             var existing = GetById(borrowing.ID);
             if (existing is null)
@@ -31,10 +49,11 @@ namespace WebApplication2.Repositories
             existing.DaysToBorrow = borrowing.DaysToBorrow;
             existing.BorrowedDate = borrowing.BorrowedDate;
             existing.ReturnedDate = borrowing.ReturnedDate;
+            _context.SaveChanges();
             return true;
         }
 
-        public static bool Delete(int id)
+        public bool Delete(int id)
         {
             var existing = GetById(id);
             if (existing is null)
@@ -42,7 +61,8 @@ namespace WebApplication2.Repositories
                 return false;
             }
 
-            _borrowings.Remove(existing);
+            _context.Borrowings.Remove(existing);
+            _context.SaveChanges();
             return true;
         }
     }

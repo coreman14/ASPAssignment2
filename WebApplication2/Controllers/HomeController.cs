@@ -7,11 +7,25 @@ namespace WebApplication2.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly ReaderRepository _readerRepository;
+        private readonly BookRepository _bookRepository;
+        private readonly BorrowingRepository _borrowingRepository;
+
+        public HomeController(
+            ReaderRepository readerRepository,
+            BookRepository bookRepository,
+            BorrowingRepository borrowingRepository)
+        {
+            _readerRepository = readerRepository;
+            _bookRepository = bookRepository;
+            _borrowingRepository = borrowingRepository;
+        }
+
         private void PopulateTables()
         {
-            var readerValues = ReaderRepository.GetAll();
-            var bookValues = BookRepository.GetAll();
-            var borrowingValues = BorrowingRepository.GetAll();
+            var readerValues = _readerRepository.GetAll();
+            var bookValues = _bookRepository.GetAll();
+            var borrowingValues = _borrowingRepository.GetAll();
 
             ViewBag.BookValues = bookValues;
             ViewBag.ReaderValues = readerValues;

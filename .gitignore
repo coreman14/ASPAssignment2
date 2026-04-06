@@ -42,7 +42,7 @@ bld/
 appsettings.local.json
 .env
 .env.local
-
+*.db
 # OS files
 .DS_Store
 Thumbs.db

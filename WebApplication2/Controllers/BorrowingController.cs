@@ -21,16 +21,30 @@ namespace WebApplication2.Controllers
     */
     public class BorrowingController : Controller
     {
+        private readonly BorrowingRepository _borrowingRepository;
+        private readonly ReaderRepository _readerRepository;
+        private readonly BookRepository _bookRepository;
+
+        public BorrowingController(
+            BorrowingRepository borrowingRepository,
+            ReaderRepository readerRepository,
+            BookRepository bookRepository)
+        {
+            _borrowingRepository = borrowingRepository;
+            _readerRepository = readerRepository;
+            _bookRepository = bookRepository;
+        }
+
         private void PopulateDropdowns(int? selectedBookId = null, int? selectedReaderId = null)
         {
-            var readerValues = ReaderRepository.GetAll().Select(x => new DropdownDto
+            var readerValues = _readerRepository.GetAll().Select(x => new DropdownDto
             {
                 Name = x.Name + " - " + x.Email,
                 Value = x.ID + "",
                 Selected = selectedReaderId.HasValue && x.ID == selectedReaderId.Value
             }).ToList();
 
-            var bookValues = BookRepository.GetAll().Where(x => x.IsAvailable || (selectedBookId.HasValue && x.ID == selectedBookId.Value))
+            var bookValues = _bookRepository.GetAll().Where(x => x.IsAvailable || (selectedBookId.HasValue && x.ID == selectedBookId.Value))
             .Select(x => new DropdownDto
             {
                 Name = x.ID + " - " + x.Title + " - " + x.Author,
@@ -44,12 +58,27 @@ namespace WebApplication2.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(BorrowingRepository.GetAll());
+            return View(_borrowingRepository.GetAll());
         }
 
+        public async Task<IActionResult> Search([FromQuery]string searchstring)
+        {
+            ViewBag.results = null;
+            IEnumerable<Borrowing>? r = string.IsNullOrEmpty(searchstring) ? null : _borrowingRepository.GetQuery(searchstring);
+            if (r == null || !r.Any())
+            {
+                r = null;
+            }
+            else
+            {
+                int rc = r.Count();
+                ViewBag.results = $"Found {rc} borrowing{(rc == 1 ? "" : "s")} for {searchstring}";
+            }
+            return View(r);
+        }
         public async Task<IActionResult> Borrowing(int id)
         {
-            var x = BorrowingRepository.GetById(id);
+            var x = _borrowingRepository.GetById(id);
             if (x == null)
             {
                 ViewBag.missType = "Borrowing";
@@ -60,9 +89,9 @@ namespace WebApplication2.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Borrowing borrowing)
         {
-            if (BookRepository.IdExist(borrowing.BookId) && ReaderRepository.IdExist(borrowing.ReaderId) && ModelState.IsValid)
+            if (_bookRepository.IdExist(borrowing.BookId) && _readerRepository.IdExist(borrowing.ReaderId) && ModelState.IsValid)
             {
-                BorrowingRepository.Create(borrowing);
+                _borrowingRepository.Create(borrowing);
                 return RedirectToAction("Index");
             }
             PopulateDropdowns(borrowing.BookId, borrowing.ReaderId);
@@ -76,10 +105,10 @@ namespace WebApplication2.Controllers
         [HttpPost]
         public async Task<IActionResult> Update(int id, Borrowing borrowing)
         {
-            if (BookRepository.IdExist(borrowing.BookId) && ReaderRepository.IdExist(borrowing.ReaderId) && ModelState.IsValid)
+            if (_bookRepository.IdExist(borrowing.BookId) && _readerRepository.IdExist(borrowing.ReaderId) && ModelState.IsValid)
             {
                 borrowing.ID = id;
-                BorrowingRepository.Update(borrowing);
+                _borrowingRepository.Update(borrowing);
                 return RedirectToAction("Index");
             }
             borrowing.ID = id;
@@ -88,7 +117,7 @@ namespace WebApplication2.Controllers
         }
         public async Task<IActionResult> Update(int id)
         {
-            var x = BorrowingRepository.GetById(id);
+            var x = _borrowingRepository.GetById(id);
             if (x == null)
             {
                 ViewBag.missType = "Borrowing";
@@ -100,13 +129,13 @@ namespace WebApplication2.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            var x = BorrowingRepository.GetById(id);
+            var x = _borrowingRepository.GetById(id);
             if (x == null)
             {
                 ViewBag.missType = "Borrowing";
                 return View("miss");
             }
-            BorrowingRepository.Delete(id);
+            _borrowingRepository.Delete(id);
             return View(x);
         }
     }
